@@ -1,7 +1,9 @@
-#include "include/Angel.h"
+#include "Angel.h"
 #include "constant.h"
 #include "stb_image.h"
 
+vec3 CubeVertices[36];
+vec3 CubeNormals[36];
 GLuint vao;
 GLuint texture;
 GLuint textureVAO, textureEBO;
@@ -26,7 +28,68 @@ vec3 legColor(0.192f, 0.192f, 0.192f);
 vec3 pageColor(1.0f, 1.0f, 1.0f);
 
 void init() {
-	const vec3 lightPos(8.0f, 12.0f, 4.0f);
+	for (int i = 0; i < 6; i++) {
+		CubeNormals[i] = vec3(0.0f, 0.0f, -1.0f);
+	}
+	for(int i = 6; i < 12; i++) {
+		CubeNormals[i] = vec3(0.0f, 0.0f, 1.0f);
+	}
+	for(int i = 12; i < 18; i++) {
+		CubeNormals[i] = vec3(-1.0f, 0.0f, 0.0f);
+	}
+	for(int i = 18; i < 24; i++) {
+		CubeNormals[i] = vec3(1.0f, 0.0f, 0.0f);
+	}
+	for(int i = 24; i < 30; i++) {
+		CubeNormals[i] = vec3(0.0f, -1.0f, 0.0f);
+	}
+	for(int i = 30; i < 36; i++) {
+		CubeNormals[i] = vec3(0.0f, 1.0f, 0.0f);
+	}
+
+	CubeVertices[0] = vec3(-0.5f, -0.5f, -0.5f);
+	CubeVertices[1] = vec3(0.5f, -0.5f, -0.5f);
+	CubeVertices[2] = vec3(0.5f, 0.5f, -0.5f);
+	CubeVertices[3] = vec3(0.5f, 0.5f, -0.5f);
+	CubeVertices[4] = vec3(-0.5f, 0.5f, -0.5f);
+	CubeVertices[5] = vec3(-0.5f, -0.5f, -0.5f);
+
+	CubeVertices[6] = vec3(-0.5f, -0.5f, 0.5f);
+	CubeVertices[7] = vec3(0.5f, -0.5f, 0.5f);
+	CubeVertices[8] = vec3(0.5f, 0.5f, 0.5f);
+	CubeVertices[9] = vec3(0.5f, 0.5f, 0.5f);
+	CubeVertices[10] = vec3(-0.5f, 0.5f, 0.5f);
+	CubeVertices[11] = vec3(-0.5f, -0.5f, 0.5f);
+	
+	CubeVertices[12] = vec3(-0.5f, 0.5f, 0.5f);
+	CubeVertices[13] = vec3(-0.5f, 0.5f, -0.5f);
+	CubeVertices[14] = vec3(-0.5f, -0.5f, -0.5f);
+	CubeVertices[15] = vec3(-0.5f, -0.5f, -0.5f);
+	CubeVertices[16] = vec3(-0.5f, -0.5f, 0.5f);
+	CubeVertices[17] = vec3(-0.5f, 0.5f, 0.5f);
+
+	CubeVertices[18] = vec3(0.5f, 0.5f, 0.5f);
+	CubeVertices[19] = vec3(0.5f, 0.5f, -0.5f);
+	CubeVertices[20] = vec3(0.5f, -0.5f, -0.5f);
+	CubeVertices[21] = vec3(0.5f, -0.5f, -0.5f);
+	CubeVertices[22] = vec3(0.5f, -0.5f, 0.5f);
+	CubeVertices[23] = vec3(0.5f, 0.5f, 0.5f);
+
+	CubeVertices[24] = vec3(-0.5f, -0.5f, -0.5f);
+	CubeVertices[25] = vec3(0.5f, -0.5f, -0.5f);
+	CubeVertices[26] = vec3(0.5f, -0.5f, 0.5f);
+	CubeVertices[27] = vec3(0.5f, -0.5f, 0.5f);
+	CubeVertices[28] = vec3(-0.5f, -0.5f, 0.5f);
+	CubeVertices[29] = vec3(-0.5f, -0.5f, -0.5f);
+
+	CubeVertices[30] = vec3(-0.5f, 0.5f, -0.5f);
+	CubeVertices[31] = vec3(0.5f, 0.5f, -0.5f);
+	CubeVertices[32] = vec3(0.5f, 0.5f, 0.5f);
+	CubeVertices[33] = vec3(0.5f, 0.5f, 0.5f);
+	CubeVertices[34] = vec3(-0.5f, 0.5f, 0.5f);
+	CubeVertices[35] = vec3(-0.5f, 0.5f, -0.5f);
+
+	const vec3 lightPos(8.0f, 12.0f, 0.0f);
 	const vec3 viewPos(2.0f, 1.0f, 5.0f);
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
@@ -34,19 +97,23 @@ void init() {
 	GLuint buffer;
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(CubeVertices), CubeVertices, GL_STATIC_DRAW);
-
-	// Position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), BUFFER_OFFSET(0));
-	glEnableVertexAttribArray(0);
-
-	// Normal attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), BUFFER_OFFSET(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(1);
-	glBindVertexArray(0);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(CubeVertices) + sizeof(CubeNormals), CubeVertices, GL_STATIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(CubeVertices), CubeVertices);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(CubeVertices), sizeof(CubeNormals), CubeNormals);
 
 	GLuint program = InitShader("lightV.glsl", "lightF.glsl");
 	glUseProgram(program);
+
+	// Position attribute
+	GLuint verticesLoc = glGetAttribLocation(program, "position");
+	glEnableVertexAttribArray(verticesLoc);
+	glVertexAttribPointer(verticesLoc, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+	
+	// Normal attribute
+	GLuint normalsLoc = glGetAttribLocation(program, "normal");
+	glEnableVertexAttribArray(normalsLoc);
+	glVertexAttribPointer(normalsLoc, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(sizeof(verticesLoc)));
+	glBindVertexArray(0);
 
 	objectColorLoc = glGetUniformLocation(program, "objectColor");
 	GLint lightColorLoc = glGetUniformLocation(program, "lightColor");
@@ -324,8 +391,8 @@ void display() {
 	laptop();
 	pen();
 	legs();
-	initTexture();
-	textureDisplay();
+	//initTexture();
+	//textureDisplay();
 
 	glutSwapBuffers();
 }

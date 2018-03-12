@@ -31,6 +31,7 @@
 #define PAGE_HEIGHT 0.0001f
 #define PAGE_WIDTH 2.3f
 
+/*
 GLfloat CubeVertices[] = {
 	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 	0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
@@ -74,6 +75,7 @@ GLfloat CubeVertices[] = {
 	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
 	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
 };
+*/
 
 GLfloat vertices[] =
 {
