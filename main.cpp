@@ -1,9 +1,11 @@
 #include "include/Angel.h"
 #include "constant.h"
-#include "SOIL2/SOIL2.h"
+#include "stb_image.h"
 
 GLuint vao;
+GLuint texture;
 GLuint textureVAO, textureEBO;
+GLuint myTexture;
 mat4 view(1.0f);
 mat4 model(1.0f);
 mat4 projection(1.0f);
@@ -237,7 +239,7 @@ void screen() {
 	
 }
 
-void texture() {
+void initTexture() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -263,7 +265,6 @@ void texture() {
 	glEnableVertexAttribArray(2);
 	glBindVertexArray(0); // Unbind VAO
 
-	GLuint texture;
 	int width, height;
 
 	glGenTextures(1, &texture);
@@ -275,18 +276,19 @@ void texture() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// Load, create texture and generate mipmaps
-	unsigned char *image = SOIL_load_image("images/screen.png", &width, &height, 0, SOIL_LOAD_RGBA);
+	unsigned char *image = stbi_load("images/screen.png", &width, &height, 0, 4);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
 	glGenerateMipmap(GL_TEXTURE_2D);
-	SOIL_free_image_data(image);
+	stbi_image_free(image);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	const GLuint textureProgram = InitShader("vshader.glsl", "fshader.glsl");
 	glUseProgram(textureProgram);
 
-	TextureModel = glGetUniformLocation(textureProgram, "model");
-	TextureView = glGetUniformLocation(textureProgram, "view");
-	TextureProjection = glGetUniformLocation(textureProgram, "projection");
+	TextureModel = glGetUniformLocation(textureProgram, "Model");
+	TextureView = glGetUniformLocation(textureProgram, "View");
+	TextureProjection = glGetUniformLocation(textureProgram, "Projection");
+	myTexture = glGetUniformLocation(textureProgram, "myTexture");
 
 	textureView = view;
 	textureProjection = projection;
@@ -294,13 +296,15 @@ void texture() {
 	glUniformMatrix4fv(TextureView, 1, GL_TRUE, textureView);
 	glUniformMatrix4fv(TextureProjection, 1, GL_TRUE, textureProjection);
 	glUniformMatrix4fv(TextureModel, 1, GL_TRUE, textureModel);
+}
 
-	mat4 instance = Translate(0.0f, 0.5 * LAPTOP_WIDTH, -0.5 * LAPTOP_WIDTH + 0.5 * LAPTOP_HEIGHT + 0.01f) * Scale(LAPTOP_LENGTH, LAPTOP_WIDTH, LAPTOP_HEIGHT);
+void textureDisplay() {
+	mat4 instance = Translate(0.0f, 0.5 * LAPTOP_WIDTH, -0.5 * LAPTOP_WIDTH + 0.5 * LAPTOP_HEIGHT + 0.01f) * Scale(LAPTOP_LENGTH - 0.2, LAPTOP_WIDTH - 0.1, LAPTOP_HEIGHT);
 	glUniformMatrix4fv(TextureModel, 1, GL_TRUE, textureModel * instance);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glUniform1i(glGetUniformLocation(textureProgram, "myTexture"), 0);
+	glUniform1i(myTexture, 0);
 	glBindVertexArray(textureVAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
@@ -320,7 +324,8 @@ void display() {
 	laptop();
 	pen();
 	legs();
-	texture();
+	initTexture();
+	textureDisplay();
 
 	glutSwapBuffers();
 }
@@ -344,6 +349,8 @@ void reshape(int width, int height) {
 
 	projection = Ortho(left, right, bottom, top, zNear, zFar);
 	glUniformMatrix4fv(Projection, 1, GL_TRUE, projection);
+	textureProjection = Ortho(left, right, bottom, top, zNear, zFar);
+	glUniformMatrix4fv(TextureProjection, 1, GL_TRUE, textureProjection);
 }
 
 void keyboard(unsigned char key, int x, int y) {
@@ -368,6 +375,8 @@ int main(int argc, char **argv) {
 
 	init();
 	glutDisplayFunc(display);
+	//initTexture();
+	//textureDisplay();
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(keyboard);
 
