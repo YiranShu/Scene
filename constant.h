@@ -27,9 +27,9 @@
 #define PEN_LENGTH 2.0f
 #define PEN_WIDTH 0.1f
 
-#define PAGE_LENGTH 0.3f
+#define PAGE_LENGTH 0.4f
 #define PAGE_HEIGHT 0.0001f
-#define PAGE_WIDTH 2.3f
+#define PAGE_WIDTH 2.4f
 
 /*
 GLfloat CubeVertices[] = {

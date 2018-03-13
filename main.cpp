@@ -93,31 +93,6 @@ void init() {
 	CubeVertices[34] = vec3(-0.5f, 0.5f, 0.5f);
 	CubeVertices[35] = vec3(-0.5f, 0.5f, -0.5f);
 
-	//!!!!!
-	texture_vertices[0] = vec3(0.5f,  0.5f, 0.0f);
-	texture_vertices[1] = vec3(0.5f, -0.5f, 0.0f);
-	texture_vertices[2] = vec3(-0.5f, -0.5f, 0.0f);
-	texture_vertices[3] = vec3(-0.5f,  0.5f, 0.0f);
-
-	texture_colors[0] = vec3(1.0f, 0.0f, 0.0f);
-	texture_colors[1] = vec3(0.0f, 1.0f, 0.0f);
-	texture_colors[2] = vec3(0.0f, 0.0f, 1.0f);
-	texture_colors[3] = vec3(1.0f, 1.0f, 0.0f);
-
-	texture_coord[0] = vec2(1.0f, 1.0f);
-	texture_coord[1] = vec2(1.0f, 0.0f);
-	texture_coord[2] = vec2(0.0f, 0.0f);
-	texture_coord[3] = vec2(0.0f, 1.0f);
-	
-	texture_indices[0] = 0;
-	texture_indices[1] = 1;
-	texture_indices[2] = 3;
-	texture_indices[3] = 1;
-	texture_indices[4] = 2;
-	texture_indices[5] = 3;
-
-	//!!!!!
-
 	const vec3 lightPos(8.0f, 12.0f, 0.0f);
 	const vec3 viewPos(2.0f, 1.0f, 5.0f);
 	glGenVertexArrays(1, &vao);
@@ -167,7 +142,45 @@ void init() {
 	glUniformMatrix4fv(Model, 1, GL_TRUE, model);
 }
 
-void initTexture() {
+void initTexture(int option) {
+	if (option == 0) {
+		texture_vertices[0] = vec3(0.5f,  0.5f, 0.0f);
+		texture_vertices[1] = vec3(0.5f, -0.5f, 0.0f);
+		texture_vertices[2] = vec3(-0.5f, -0.5f, 0.0f);
+		texture_vertices[3] = vec3(-0.5f,  0.5f, 0.0f);
+	}
+
+	else if (option == 1) {
+		texture_vertices[0] = vec3(0.5f,  0.0f, -0.5f);
+		texture_vertices[1] = vec3(0.5f, 0.0f, 0.5f);
+		texture_vertices[2] = vec3(-0.5f, 0.0f, 0.5f);
+		texture_vertices[3] = vec3(-0.5f,  0.0f, -0.5f);
+	}
+
+	else {
+		texture_vertices[0] = vec3(0.0f,  0.5f, -0.5f);
+		texture_vertices[1] = vec3(0.0f, -0.5f, -0.5f);
+		texture_vertices[2] = vec3(0.0f, -0.5f, 0.5f);
+		texture_vertices[3] = vec3(0.0f,  0.5f, 0.5f);
+	}
+
+	texture_colors[0] = vec3(1.0f, 0.0f, 0.0f);
+	texture_colors[1] = vec3(0.0f, 1.0f, 0.0f);
+	texture_colors[2] = vec3(0.0f, 0.0f, 1.0f);
+	texture_colors[3] = vec3(1.0f, 1.0f, 0.0f);
+
+	texture_coord[0] = vec2(1.0f, 1.0f);
+	texture_coord[1] = vec2(1.0f, 0.0f);
+	texture_coord[2] = vec2(0.0f, 0.0f);
+	texture_coord[3] = vec2(0.0f, 1.0f);
+	
+	texture_indices[0] = 0;
+	texture_indices[1] = 1;
+	texture_indices[2] = 3;
+	texture_indices[3] = 1;
+	texture_indices[4] = 2;
+	texture_indices[5] = 3;
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -202,8 +215,6 @@ void initTexture() {
 	glVertexAttribPointer(textureTextureCoordLoc, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(sizeof(texture_vertices) + sizeof(texture_colors)));
 	glBindVertexArray(0);
 
-	int width, height;
-
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	// Set our texture parameters
@@ -213,11 +224,11 @@ void initTexture() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// Load, create texture and generate mipmaps
-	unsigned char *image = stbi_load("images/screen.png", &width, &height, 0, 4);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	stbi_image_free(image);
-	glBindTexture(GL_TEXTURE_2D, 0);
+	// unsigned char *image = stbi_load("images/screen.png", &width, &height, 0, 4);
+	// glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+	// glGenerateMipmap(GL_TEXTURE_2D);
+	// stbi_image_free(image);
+	// glBindTexture(GL_TEXTURE_2D, 0);
 
 	TextureModel = glGetUniformLocation(textureProgram, "Model");
 	TextureView = glGetUniformLocation(textureProgram, "View");
@@ -330,12 +341,8 @@ void books() {
 	glBindVertexArray(0);
 }
 
-void lamp() {
-	
-}
-
 void pages() {
-	mat4 instance = Translate(-0.5 * BASE_LENGTH + 1.0 * (SIDE_WALL_LENGTH + BOOK_LENGTH), BOOK_HEIGHT, -0.5 * BASE_WIDTH + WALL_WIDTH + 0.5 * BOOK_WIDTH - 0.2f) * Scale(PAGE_LENGTH, PAGE_HEIGHT, PAGE_WIDTH);
+	mat4 instance = Translate(-0.5 * BASE_LENGTH + 1.0 * (SIDE_WALL_LENGTH + BOOK_LENGTH), BOOK_HEIGHT, -0.5 * BASE_WIDTH + WALL_WIDTH + 0.5 * BOOK_WIDTH - 0.15f) * Scale(PAGE_LENGTH, PAGE_HEIGHT, PAGE_WIDTH);
 
 	glUniform3f(objectColorLoc, pageColor.x, pageColor.y, pageColor.z);
 	glUniformMatrix4fv(Model, 1, GL_TRUE, model * instance);
@@ -343,7 +350,7 @@ void pages() {
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
 
-	instance = Translate(-0.5 * BASE_LENGTH + 1.5 * (SIDE_WALL_LENGTH + BOOK_LENGTH), BOOK_HEIGHT, -0.5 * BASE_WIDTH + WALL_WIDTH + 0.5 * BOOK_WIDTH - 0.2f) * Scale(PAGE_LENGTH, PAGE_HEIGHT, PAGE_WIDTH);
+	instance = Translate(-0.5 * BASE_LENGTH + 1.5 * (SIDE_WALL_LENGTH + BOOK_LENGTH), BOOK_HEIGHT, -0.5 * BASE_WIDTH + WALL_WIDTH + 0.5 * BOOK_WIDTH - 0.15f) * Scale(PAGE_LENGTH, PAGE_HEIGHT, PAGE_WIDTH);
 
 	glUniform3f(objectColorLoc, pageColor.x, pageColor.y, pageColor.z);
 	glUniformMatrix4fv(Model, 1, GL_TRUE, model * instance);
@@ -351,7 +358,7 @@ void pages() {
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
 
-	instance = Translate(-0.5 * BASE_LENGTH + 2.0 * (SIDE_WALL_LENGTH + BOOK_LENGTH), BOOK_HEIGHT + 0.01f, -0.5 * BASE_WIDTH + WALL_WIDTH + 0.5 * BOOK_WIDTH - 0.2f) * Scale(PAGE_LENGTH, PAGE_HEIGHT, PAGE_WIDTH);
+	instance = Translate(-0.5 * BASE_LENGTH + 2.0 * (SIDE_WALL_LENGTH + BOOK_LENGTH), BOOK_HEIGHT + 0.01f, -0.5 * BASE_WIDTH + WALL_WIDTH + 0.5 * BOOK_WIDTH - 0.15f) * Scale(PAGE_LENGTH, PAGE_HEIGHT, PAGE_WIDTH);
 
 	glUniform3f(objectColorLoc, pageColor.x, pageColor.y, pageColor.z);
 	glUniformMatrix4fv(Model, 1, GL_TRUE, model * instance);
@@ -359,7 +366,7 @@ void pages() {
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
 
-	instance = Translate(-0.5 * BASE_LENGTH + 2.5 * (SIDE_WALL_LENGTH + BOOK_LENGTH), BOOK_HEIGHT + 0.01f, -0.5 * BASE_WIDTH + WALL_WIDTH + 0.5 * BOOK_WIDTH - 0.2f) * Scale(PAGE_LENGTH, PAGE_HEIGHT, PAGE_WIDTH);
+	instance = Translate(-0.5 * BASE_LENGTH + 2.5 * (SIDE_WALL_LENGTH + BOOK_LENGTH), BOOK_HEIGHT + 0.01f, -0.5 * BASE_WIDTH + WALL_WIDTH + 0.5 * BOOK_WIDTH - 0.15f) * Scale(PAGE_LENGTH, PAGE_HEIGHT, PAGE_WIDTH);
 
 	glUniform3f(objectColorLoc, pageColor.x, pageColor.y, pageColor.z);
 	glUniformMatrix4fv(Model, 1, GL_TRUE, model * instance);
@@ -396,12 +403,58 @@ void laptop() {
 	glBindVertexArray(0);
 }
 
-void screen() {
-	
+void screenTexture() {
+	//screen
+	int screenWidth, screenHeight;
+	unsigned char *image = stbi_load("images/screen.png", &screenWidth, &screenHeight, 0, 4);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenWidth, screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	stbi_image_free(image);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	mat4 instance = Translate(0.0f, 0.5 * LAPTOP_WIDTH, -0.5 * LAPTOP_WIDTH + 0.5 * LAPTOP_HEIGHT + 0.01f) * Scale(LAPTOP_LENGTH - 0.2, LAPTOP_WIDTH - 0.1, LAPTOP_HEIGHT);
+	glUniformMatrix4fv(TextureModel, 1, GL_TRUE, textureModel * instance);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glUniform1i(myTexture, 0);
+	glBindVertexArray(textureVAO);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
 }
 
-void textureDisplay() {
-	mat4 instance = Translate(0.0f, 0.5 * LAPTOP_WIDTH, -0.5 * LAPTOP_WIDTH + 0.5 * LAPTOP_HEIGHT + 0.01f) * Scale(LAPTOP_LENGTH - 0.2, LAPTOP_WIDTH - 0.1, LAPTOP_HEIGHT);
+void keyboardTexture() {
+	//keyboard
+	int keyboardWidth, keyboardHeight;
+	unsigned char *image = stbi_load("images/keyboard.png", &keyboardWidth, &keyboardHeight, 0, 4);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, keyboardWidth, keyboardHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	stbi_image_free(image);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	mat4 instance = Translate(0.0f, LAPTOP_HEIGHT + 0.01f, 0.0f) * Scale(LAPTOP_LENGTH, LAPTOP_HEIGHT, LAPTOP_WIDTH);
+	glUniformMatrix4fv(TextureModel, 1, GL_TRUE, textureModel * instance);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glUniform1i(myTexture, 0);
+	glBindVertexArray(textureVAO);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+}
+
+void bookTexture() {
+	//keyboard
+	int bookWidth, bookHeight;
+	unsigned char *image = stbi_load("images/book.png", &bookWidth, &bookHeight, 0, 4);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bookWidth, bookHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	stbi_image_free(image);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	//instance = Translate(-0.5 * BASE_LENGTH + 4.0 * BOOK_LENGTH + 0.5 * (SIDE_WALL_LENGTH + BOOK_LENGTH), 0.5 * BOOK_HEIGHT, -0.5 * BASE_WIDTH + WALL_WIDTH + 0.5 * BOOK_WIDTH) * Scale(BOOK_LENGTH, BOOK_HEIGHT, BOOK_WIDTH);
+
+	mat4 instance = Translate(-0.5 * BASE_LENGTH + 4.0 * BOOK_LENGTH + 0.5 * (SIDE_WALL_LENGTH + BOOK_LENGTH * 2) + 0.01f, 0.5 * BOOK_HEIGHT, -0.5 * BASE_WIDTH + WALL_WIDTH + 0.5 * BOOK_WIDTH) * Scale(BOOK_LENGTH, BOOK_HEIGHT, BOOK_WIDTH);
 	glUniformMatrix4fv(TextureModel, 1, GL_TRUE, textureModel * instance);
 
 	glActiveTexture(GL_TEXTURE0);
@@ -427,8 +480,12 @@ void display() {
 	laptop();
 	pen();
 	legs();
-	initTexture();
-	textureDisplay();
+	initTexture(0);
+	screenTexture();
+	initTexture(1);
+	keyboardTexture();
+	initTexture(2);
+	bookTexture();
 
 	glutSwapBuffers();
 }
